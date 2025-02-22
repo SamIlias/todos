@@ -1,0 +1,41 @@
+{
+  "name": "frontend_todos",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "build": "webpack --config webpack.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "eslint": "^8.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.4.2",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "async": "^3.2.6",
+    "axios": "^1.7.9",
+    "core-js": "^3.40.0",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "i18next": "^24.2.2",
+    "jquery": "^3.7.1",
+    "lodash": "^4.17.21",
+    "on-change": "^5.0.1",
+    "regenerator-runtime": "^0.14.1",
+    "yup": "^1.6.1"
+  }
+}
