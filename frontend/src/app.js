@@ -1,13 +1,10 @@
 /* eslint-disable no-param-reassign */
-// import 'dotenv/config';
 import axios from 'axios';
 import * as yup from 'yup';
 import onChange from 'on-change';
 import initView from './view.js';
 
 const BACKEND_PORT = 3000;
-// const BACKEND_PORT = process.env.BACKEND_PORT || 3000;
-// const API_URL = `http://localhost:${BACKEND_PORT}/todos`;
 const API_URL = `http://localhost:${BACKEND_PORT}/todos`;
 
 const app = async () => {
@@ -82,7 +79,8 @@ const app = async () => {
     e.preventDefault();
 
     const todoName = watchedState.inputForm.data.currentTodo;
-    if (!todoName) {
+    const inputError = watchedState.inputForm.errors.input;
+    if (!todoName || inputError) {
       return;
     }
 

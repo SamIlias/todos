@@ -20,11 +20,7 @@ RUN npm run build
 # Use Nginx to serve static files
 FROM nginx:1.25
 
-# Remove the default Nginx config and copy the custom one
-# RUN rm /etc/nginx/conf.d/default.conf
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy the built files from the first container
+# Copy the built files from the backend container
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Expose port 80
