@@ -17,7 +17,8 @@ app.use(express.json());
 // POST /todos — save todo
 app.post('/todos', async (req, res) => {
   try {
-    const data = req.body; //{ todo: {name: 'name'}}
+    // const data = req.body; //{ todo: {name: 'name'}}
+    const data = req.body; //{ name: todoName, description: todoDescription }
 
     let todos = [];
     try {
@@ -27,7 +28,7 @@ app.post('/todos', async (req, res) => {
       console.log(' File does not exist. Create new file.');
     }
 
-    todos.push(data.todo.name);
+    todos.push(data);
 
     await fsp.writeFile(filePath, JSON.stringify(todos, null, 2));
 

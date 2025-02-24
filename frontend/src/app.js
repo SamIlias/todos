@@ -9,13 +9,20 @@ const API_URL = `http://localhost:${BACKEND_PORT}/todos`;
 
 const app = async () => {
   const state = {
-    submitState: 'input', // 'sending'
-    inputForm: {
-      state: null,
+    formState: 'input', // 'sending'
+    nameInput: {
+      state: null, // is-valid, is-invalid
       data: {
-        currentTodo: '',
+        curValue: '',
       },
-      errors: { input: null },
+      error: null,
+    },
+    descriptionInput: {
+      state: null, // is-valid, is-invalid
+      data: {
+        curValue: '',
+      },
+      error: null,
     },
     todosList: [],
     appErrors: null,
@@ -23,7 +30,8 @@ const app = async () => {
 
   const { body } = document;
   const form = document.getElementById('todo-form');
-  const input = form.querySelector('#todo-input');
+  const nameInput = form.querySelector('#todo-input');
+  const descriptionInput = form.querySelector('#description-input');
 
   const render = initView(body, state);
   const watchedState = onChange(state, render);
@@ -38,7 +46,8 @@ const app = async () => {
       watchedState.appErrors = err.message;
     });
 
-  const inputValueSchema = yup.string().min(3).max(10).required();
+  const nameValueSchema = yup.string().min(3).max(15).required();
+  const descriptionValueSchema = yup.string().min(3).max(45).required();
 
   const validateField = async (schema, value, dataHandler, errorHandler) => {
     try {
@@ -49,64 +58,63 @@ const app = async () => {
     }
   };
 
-  const inputValueHandler = value => {
-    watchedState.inputForm.state = 'is-valid';
-    watchedState.inputForm.data.currentTodo = value;
+  const inputDataHandler = input => value => {
+    watchedState[input].state = 'is-valid';
+    watchedState[input].data.curValue = value;
   };
 
-  const inputErrorHandler = err => {
-    watchedState.inputForm.state = 'is-invalid';
-    watchedState.inputForm.errors.input = err.message;
+  const inputErrorHandler = input => err => {
+    watchedState[input].state = 'is-invalid';
+    watchedState[input].error = err.message;
   };
 
-  const nullifyObj = obj => {
-    Object.keys(obj).forEach(key => {
-      obj[key] = null;
-    });
-  };
-
-  input.addEventListener('input', async () => {
-    nullifyObj(watchedState.inputForm.errors);
+  nameInput.addEventListener('input', async () => {
+    watchedState.nameInput.error = null;
     validateField(
-      inputValueSchema,
-      input.value,
-      inputValueHandler,
-      inputErrorHandler,
+      nameValueSchema,
+      nameInput.value,
+      inputDataHandler('nameInput'),
+      inputErrorHandler('nameInput'),
+    );
+  });
+
+  descriptionInput.addEventListener('input', async () => {
+    watchedState.descriptionInput.error = null;
+    validateField(
+      descriptionValueSchema,
+      descriptionInput.value,
+      inputDataHandler('descriptionInput'),
+      inputErrorHandler('descriptionInput'),
     );
   });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const todoName = watchedState.inputForm.data.currentTodo;
-    const inputError = watchedState.inputForm.errors.input;
-    if (!todoName || inputError) {
+    const todoName = watchedState.nameInput.data.curValue;
+    const nameError = watchedState.nameInput.error;
+    const todoDescription = watchedState.descriptionInput.data.curValue;
+    const descriptionError = watchedState.descriptionInput.error;
+
+    if (!todoName || nameError || !todoDescription || descriptionError) {
       return;
     }
 
-    watchedState.submitState = 'sending';
-    const dataToSend = { todo: { name: todoName } };
+    watchedState.formState = 'sending';
+    const dataToSend = { name: todoName, description: todoDescription };
 
-    await axios
-      .post(API_URL, dataToSend)
-      .then(res => {
-        // console.log(res.data); // todo
-      })
-      .catch(err => {
-        watchedState.appErrors = err.message;
-      });
+    try {
+      const res = await axios.post(API_URL, dataToSend);
+      console.log(res.data.todos);
+      watchedState.todosList = res.data.todos;
+    } catch (err) {
+      watchedState.appErrors = err.message;
+    }
 
-    await axios
-      .get(API_URL)
-      .then(res => {
-        watchedState.todosList = res.data;
-      })
-      .catch(err => {
-        watchedState.appErrors = err.message;
-      });
+    watchedState.nameInput.data.curValue = '';
+    watchedState.descriptionInput.data.curValue = '';
 
-    watchedState.inputForm.data.currentTodo = null;
-    watchedState.submitState = 'input';
+    watchedState.formState = 'input';
   });
 };
 

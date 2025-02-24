@@ -4,11 +4,18 @@ import $ from 'jquery';
 
 const initView = (body, state) => {
   const submitButton = $('#todo-submit', body);
-  const input = $('#todo-input', body);
-  const inputContainer = $('.form-group', body);
-  const feedbackContainer = $('<div></div>').addClass('invalid-feedback');
-  inputContainer.append(feedbackContainer);
-  feedbackContainer.hide();
+  const nameInput = $('#todo-input', body);
+  const descriptionInput = $('#description-input', body);
+  const nameFeedbackContainer = $('<div></div>').addClass('invalid-feedback');
+  const descriptionFeedbackContainer =
+    $('<div></div>').addClass('invalid-feedback');
+
+  nameInput.after(nameFeedbackContainer);
+  descriptionInput.after(descriptionFeedbackContainer);
+
+  nameFeedbackContainer.hide();
+  descriptionFeedbackContainer.hide();
+
   const ul = $('#todos');
   const toast = $('.toast', body);
 
@@ -24,37 +31,39 @@ const initView = (body, state) => {
     });
   };
 
-  const submitStateFns = {
-    input: () => enableElements([input, submitButton]),
+  const formStateFns = {
+    input: () => enableElements([nameInput, descriptionInput, submitButton]),
     sending: () => {
-      disableElements([input, submitButton]);
-      input.val(null);
+      disableElements([nameInput, descriptionInput, submitButton]);
+      nameInput.val('');
+      descriptionInput.val('');
     },
   };
 
   return (path, value, prevValue) => {
-    if (path === 'inputForm.state') {
-      input.removeClass(prevValue);
-      input.addClass(value);
+    if (path === 'nameInput.state') {
+      nameInput.removeClass('is-valid');
+      nameInput.removeClass('is-invalid');
+      nameInput.addClass(value);
     }
 
-    if (path === 'submitState') {
-      submitStateFns[value]();
+    if (path === 'descriptionInput.state') {
+      descriptionInput.removeClass('is-valid');
+      descriptionInput.removeClass('is-invalid');
+      descriptionInput.addClass(value);
     }
 
-    if (path === 'inputForm.errors.input') {
-      feedbackContainer.text(value || '').toggle(!!value);
+    if (path === 'formState') {
+      formStateFns[value]();
     }
-    // if (path === 'inputForm.errors.input') {
-    //   if (value) {
-    //     feedbackContainer.show();
-    //     feedbackContainer.text(value);
-    //   }
-    //
-    //   if (value === null) {
-    //     feedbackContainer.hide();
-    //   }
-    // }
+
+    if (path === 'nameInput.error') {
+      nameFeedbackContainer.text(value || '').toggle(!!value);
+    }
+
+    if (path === 'descriptionInput.error') {
+      descriptionFeedbackContainer.text(value || '').toggle(!!value);
+    }
 
     if (path === 'appErrors') {
       if (value) {
@@ -68,7 +77,7 @@ const initView = (body, state) => {
       ul.empty();
       state.todosList.forEach(todo => {
         const li = $('<li></li>');
-        li.text(todo);
+        li.text(`${todo.name}: ${todo.description}`);
         ul.append(li);
       });
     }
