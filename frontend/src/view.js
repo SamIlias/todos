@@ -68,6 +68,7 @@ const initView = (body, state) => {
     if (path === 'appErrors') {
       if (value) {
         toast.addClass('show');
+        toast.text(value);
       } else {
         toast.removeClass('show');
       }

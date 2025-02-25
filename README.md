@@ -20,3 +20,5 @@ To run this app:
 1. Clone this repository to local folder.
 2. `make runApp`.
 3. Open in browser http://localhost:80.
+
+_The main goal of this project is to understand how to create a server, interact with it, and connect the frontend with the backend. Also, I practiced using the jQuery library in this project._
